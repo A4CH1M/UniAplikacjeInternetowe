@@ -16,6 +16,7 @@ header {
 
 header h1 {
     color: white;
+    letter-spacing: 1em;
 }
 
 /* Main - centrowanie i biały background */
@@ -28,18 +29,22 @@ main {
     border-radius: 10px;
 }
 
+section p {
+    text-decoration: underline;
+}
+
 /* Tytuły */
 h1 {
     color: #333;
     font-size: 48px;
     text-align: center;
-
 }
 
 h2 {
     color: #333;
     font-size: 36px;
     text-align: center;
+    text-transform: capitalize;
 }
 
 h3 {
@@ -61,6 +66,11 @@ ul {
     font-size: 18px;
     list-style-type: square;
     margin: 20px 40px;
+}
+
+li {
+    text-transform: uppercase;
+    text-decoration: dotted #ff4500 line-through;
 }
 
 /* Obrazek */
@@ -102,7 +112,6 @@ footer p {
 
 /* Responsywność */
 
-/* Tablety (max-width: 768px) */
 @media (max-width: 768px) {
     header {
         padding: 20px 10px;
@@ -115,6 +124,7 @@ footer p {
 
     h1 {
         font-size: 36px;
+        letter-spacing: 0.1em !important;
     }
 
     h2 {
