@@ -1,0 +1,116 @@
+body {
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: grey; */
+    background: url("./bcg.jpg") repeat center center;
+}
+
+.task-app {
+    width: 600px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+ul {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+/* Stylizacja wejść i przycisków */
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Stylizacja elementów listy */
+li {
+    display: grid;
+    grid-template-columns: 40px 1fr 140px 40px;
+    align-items: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+li input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+/* Nazwa zadania powinna skalować się tylko pionowo */
+li span.task-name {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    padding: 5px;
+}
+
+li span.task-date {
+    display: flex;
+    justify-content: center;
+}
+
+li input[type="date"] {
+    width: 100%;
+    padding: 5px;
+}
+
+li button.delete-task {
+    width: 40px;
+    height: 40px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+li button.delete-task::before {
+    font-size: 30px;
+    content: '🗑️';
+}
+
+/* Zastąpienie float: left na flexbox */
+.new-task {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Pole tekstowe nad datą i przyciskiem */
+#new-task-text {
+    margin-bottom: 10px;
+}
+
+.new-task-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+#new-task-date {
+    width: 60% !important;
+    margin-bottom: 5px;
+}
+
+.new-task button {
+    width: 40% !important;
+    margin-bottom: 5px;
+}
