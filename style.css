@@ -5,7 +5,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background-color: grey; */
     background: url("./bcg.jpg") repeat center center;
 }
 
@@ -15,17 +14,21 @@ body {
     background-color: #fff;
     box-shadow: 0 0 100px rgba(0, 0, 0, 0.75);
     border-radius: 8px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    overflow: hidden;
+    margin: 10px 0; /* Dodany margines na górze i na dole */
+    max-height: calc(100vh - 20px); /* Maksymalna wysokość to wysokość okna - marginesy */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
-ul {
+.task-list-container {
+    overflow-y: auto; /* Dodajemy przewijanie pionowe */
+    flex-grow: 1; /* Dzięki temu kontener listy będzie rósł */
     border-top: 1px solid black;
     border-bottom: 1px solid black;
+    margin: 10px 0;
 }
 
-/* Stylizacja wejść i przycisków */
 input, button {
     width: 100%;
     padding: 10px;
@@ -39,7 +42,6 @@ ul {
     margin: 0;
 }
 
-/* Stylizacja elementów listy */
 li {
     display: grid;
     grid-template-columns: 40px 1fr 140px 40px;
@@ -56,7 +58,6 @@ li input[type="checkbox"] {
     height: 20px;
 }
 
-/* Nazwa zadania powinna skalować się tylko pionowo */
 li span.task-name {
     overflow-wrap: break-word;
     word-break: break-word;
@@ -66,11 +67,6 @@ li span.task-name {
 li span.task-date {
     display: flex;
     justify-content: center;
-}
-
-li input[type="date"] {
-    width: 100%;
-    padding: 5px;
 }
 
 li button.delete-task {
@@ -89,13 +85,11 @@ li button.delete-task::before {
     content: '🗑️';
 }
 
-/* Zastąpienie float: left na flexbox */
 .new-task {
     display: flex;
     flex-direction: column;
 }
 
-/* Pole tekstowe nad datą i przyciskiem */
 #new-task-text {
     margin-bottom: 10px;
 }
@@ -113,4 +107,23 @@ li button.delete-task::before {
 .new-task button {
     width: 40% !important;
     margin-bottom: 5px;
+}
+
+li.edit-mode {
+    grid-template-columns: 1fr 25% 15% 40px;
+}
+
+li.edit-mode input.edit-name {
+    width: 100%;
+    padding: 5px;
+}
+
+li.edit-mode input.edit-date {
+    width: 100%;
+    padding: 5px;
+}
+
+li.edit-mode button.save-task {
+    width: 100%;
+    padding: 5px;
 }
