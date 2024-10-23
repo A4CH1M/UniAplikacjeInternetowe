@@ -1,17 +1,16 @@
-// Inicjalizacja mapy Leaflet
+"use strict";
+
 const map = L.map('map', { zoomControl: false }).setView([52.2297, 21.0122], 13);
 const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Dodanie przycisków zoom jako kontrolki
 L.control.zoom({ position: 'topright' }).addTo(map);
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
-  }
+}
 
-// Pobieranie lokalizacji użytkownika
 document.getElementById('location-button').addEventListener('click', () => {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -42,11 +41,11 @@ document.getElementById('download-button').addEventListener('click', () => {
     });
 });
 
-function createPuzzle(canvas) {
+const createPuzzle = (canvas) => {
     const puzzleSize = 100;
     const pieces = [];
 
-    puzzlePosition = []
+    const puzzlePosition = []
 
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 4; j++) {
@@ -54,6 +53,8 @@ function createPuzzle(canvas) {
         }
     }
     
+    console.log(puzzlePosition[0]);
+
     for (let row = 0; row < 4; row++) {
         for (let col = 0; col < 4; col++) {
             const pieceCanvas = document.createElement('canvas');
@@ -63,18 +64,28 @@ function createPuzzle(canvas) {
             
             const pos = getRandomInt(puzzlePosition.length);
 
-            // Wycinamy fragment obrazu mapy
+            // console.log(puzzlePosition[pos][0]);
+
             context.drawImage(canvas, col * puzzleSize, row * puzzleSize, puzzleSize, puzzleSize, 0, 0, puzzleSize, puzzleSize);
             
             const piece = document.createElement('div');
             piece.className = 'puzzle-piece';
             piece.style.backgroundImage = `url(${pieceCanvas.toDataURL()})`;
-            piece.style.top = `${pos[0] * piece.style.height}px`;
-            piece.style.left = `${pos[1] * piece.style.width}px`;
-            console.log((r + c) + ' ' + piece.style.top + ' ' + piece.style.top);
+
+            document.getElementById('puzzle-container').appendChild(piece);
+
+            const pieceHeight = piece.offsetHeight;
+            const pieceWidth = piece.offsetWidth;
+
+            console.log(pieceHeight);
+            piece.style.top = `${puzzlePosition[pos][0] * pieceHeight}px`;
+            piece.style.left = `${puzzlePosition[pos][1] * pieceWidth}px`;
+            // console.log(piece.style.top + ' ' + piece.style.top);
             piece.draggable = true;
 
             puzzlePosition.splice(pos, 1);
+
+            // console.log(puzzlePosition.length);
 
             piece.addEventListener('dragstart', handleDragStart);
             piece.addEventListener('dragover', handleDragOver);
@@ -89,15 +100,15 @@ function createPuzzle(canvas) {
 // Obsługa mechanizmu Drag & Drop
 let draggedPiece = null;
 
-function handleDragStart(event) {
+const handleDragStart = (event) => {
     draggedPiece = event.target;
 }
 
-function handleDragOver(event) {
+const handleDragOver = (event) => {
     event.preventDefault();
 }
 
-function handleDrop(event) {
+const handleDrop = (event) => {
     event.preventDefault();
     const target = event.target;
 
@@ -113,8 +124,34 @@ function handleDrop(event) {
     }
 }
 
+const createDropZoneGrid = () => {
+    const dropZone = document.getElementById('drop-zone');
+
+    dropZone.innerHTML = '';
+    for (let i = 0; i < 16; i++) {
+        const dropCell = document.createElement('div');
+        dropCell.className = 'drop-cell';
+        dropCell.style.width = '100px';
+        dropCell.style.height = '100px';
+        dropCell.style.border = '1px solid black';
+        dropCell.addEventListener('dragover', handleDragOver);
+        dropCell.addEventListener('drop', handleDropToGrid);
+        dropZone.appendChild(dropCell);
+    }
+}
+
+const handleDropToGrid = (event) => {
+    event.preventDefault();
+    const dropCell = event.target;
+
+    if (draggedPiece && dropCell.className === 'drop-cell') {
+        dropCell.appendChild(draggedPiece);
+        draggedPiece.style.position = 'static';
+    }
+}
+
 // Sprawdzanie czy puzzle są na właściwym miejscu
-function checkPuzzleCompletion() {
+const checkPuzzleCompletion = () => {
     let allCorrect = true;
     
     const pieces = document.querySelectorAll('.puzzle-piece');
@@ -131,3 +168,26 @@ function checkPuzzleCompletion() {
         new Notification("Gratulacje! Puzzle ułożone poprawnie.");
     }
 }
+
+document.getElementById('download-button').addEventListener('click', () => {
+
+    document.getElementById('loading-spinner').style.display = 'block';
+    // document.getElementById('drop-zone').innerHtml;
+    leafletImage(map, function(err, canvas) {
+        document.getElementById('loading-spinner').style.display = 'none';
+        if (err) {
+            console.error("Błąd przy generowaniu obrazu mapy:", err);
+            return;
+        }
+
+        const mapCanvas = document.getElementById('map-canvas');
+        const context = mapCanvas.getContext('2d');
+        mapCanvas.width = canvas.width;
+        mapCanvas.height = canvas.height;
+        context.drawImage(canvas, 0, 0);
+        createPuzzle(mapCanvas);
+    });
+});
+
+
+createDropZoneGrid();
