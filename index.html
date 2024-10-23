@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle z Mapą</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <h1>Puzzle z Mapą</h1>
+    <div id="buttons-container">
+        <button id="location-button">Moja lokalizacja</button>
+        <button id="download-button">Pobierz mapę</button>
+    </div>
+    <div id="grid-container">
+        <div id="map"></div>
+        <canvas id="map-canvas"></canvas>
+        <div id="puzzle-container"></div>
+        <div id="drop-zone"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/leaflet-image@0.4.0/leaflet-image.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
