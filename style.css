@@ -31,6 +31,10 @@ h1 {
     margin: 0 auto;
 }
 
+#loading-spinner {
+    display: none;
+}
+
 #map, #map-canvas, #puzzle-container, #drop-zone {
     height: 400px;
     width: 400px;
