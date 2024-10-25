@@ -7,32 +7,34 @@ const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.pn
 
 L.control.zoom({ position: 'topright' }).addTo(map);
 
-let piecesPlaced = 0;
+const requestNotificationPermission = () => {
+    if ('Notification' in window) {
+        Notification.requestPermission().then((permission) => {
+            localStorage.setItem('notificationPermission', permission);
+        });
+    }
+};
+
+const notifyUser = () => {
+    const permission = localStorage.getItem('notificationPermission');
+
+    if (permission === 'granted') {
+        const options = {
+            body: 'Puzzle zostały poprawnie ułożone!',
+        };
+        new Notification('Gratulacje!', options);
+    } else {
+        alert('Gratulacje! Puzzle zostały poprawnie ułożone');
+    }
+};
 
 const getRandomInt = (max) => {
     return Math.floor(Math.random() * max);
 }
 
-const notifyUser = (message) => {
-    if (!("Notification" in window)) {
-        alert("Twoja przeglądarka nie obsługuje powiadomień.");
-    }
-    else if (Notification.permission === "granted") {
-        console.log("LTSK");
-        new Notification(message);
-    }
-    else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                console.log("SKDJLZP");
-                new Notification("Gratulacje", {
-                    body: "Puzzle ułożone!"
-                });
-            }
-        });
-    }
-    console.log('No i w pizdu...');
-}
+window.addEventListener('load', () => {
+    requestNotificationPermission();
+});
 
 document.getElementById('location-button').addEventListener('click', () => {
     if (navigator.geolocation) {
@@ -48,7 +50,6 @@ document.getElementById('location-button').addEventListener('click', () => {
     }
 });
 
-// Generowanie mapy i puzzli
 document.getElementById('download-button').addEventListener('click', () => {
     document.getElementById('loading-spinner').style.display = 'block';
 
@@ -132,7 +133,6 @@ const handleDragOver = (event) => {
 }
 
 const createDropZoneGrid = () => {
-    piecesPlaced = 0;
     const dropZone = document.getElementById('drop-zone');
     dropZone.innerHTML = '';
 
@@ -149,12 +149,55 @@ const createDropZoneGrid = () => {
 const handleDropToGrid = (event) => {
     event.preventDefault();
     const dropCell = event.target;
-    if (draggedPiece && dropCell.className === 'drop-cell') {
-        piecesPlaced++;
-        dropCell.appendChild(draggedPiece);
-        draggedPiece.style.position = 'static';
-        checkPuzzleCompletion();
+
+    if (draggedPiece == null) {
+        return;
     }
+
+    if (dropCell.className === 'drop-cell') {
+        dropCell.appendChild(draggedPiece);
+    }
+    else if (dropCell.className === 'puzzle-piece') {
+        if (draggedPiece === dropCell) {
+            return;
+        }
+
+        const tmpId = draggedPiece.id;
+        const tmpBackground = draggedPiece.style.backgroundImage;
+        const top = draggedPiece.style.top;
+        const left = draggedPiece.style.left;
+
+        draggedPiece.id = dropCell.id;
+        draggedPiece.style.backgroundImage = dropCell.style.backgroundImage;
+
+        dropCell.id = tmpId;
+        dropCell.style.backgroundImage = tmpBackground;
+
+        if (draggedPiece.parentElement.id === 'puzzle-container') {
+            return;
+        }
+    }
+
+    draggedPiece.style.position = 'static';
+    checkPuzzleCompletion();
+}
+
+const finishImage = (pieces) => {
+    draggedPiece = null;
+    for (let piece of pieces) {
+        piece.style.width = '150px';
+        piece.style.height = '100px';
+        piece.style.border = '0px';
+        piece.setAttribute('draggable', false);
+        piece.removeEventListener('dragstart', handleDragStart);
+    }
+
+    const dropCells = document.getElementById('drop-zone').querySelectorAll('.drop-cell');
+
+    for (let cell of dropCells) {
+        cell.style.border = '0px';
+    }
+
 }
 
 const checkPuzzleCompletion = () => {
@@ -167,20 +210,16 @@ const checkPuzzleCompletion = () => {
     }
 
     pieces.forEach((piece, index) => {
-        // const correctTop = Math.floor(index / 4) * 100 + 'px';
-        // const correctLeft = (index % 4) * 100 + 'px';
-
-        // if (piece.style.top !== correctTop || piece.style.left !== correctLeft) {
-        //     allCorrect = false;
-        // }
-        console.log("piece id: " + piece.id + " curr idx: " + index);
         if (piece.id != index) {
             allCorrect = false;
         }
     });
 
     if (allCorrect) {
-        //console.log("Gratulacje! Puzzle ułożone poprawnie.")
+        finishImage(pieces)        
         notifyUser();
+        setTimeout(() => {
+            notifyUser();
+        }, 0);
     }
 }

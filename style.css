@@ -4,6 +4,8 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
+    max-height: 930px;
+    overflow: hidden;
 }
 
 h1 {
@@ -12,6 +14,10 @@ h1 {
 
 #buttons-container {
     margin: 20px 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 #buttons-container button {
