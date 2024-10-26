@@ -217,7 +217,6 @@ const checkPuzzleCompletion = () => {
 
     if (allCorrect) {
         finishImage(pieces)        
-        notifyUser();
         setTimeout(() => {
             notifyUser();
         }, 0);
