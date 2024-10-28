@@ -1,8 +1,9 @@
 "use strict";
 
 const map = L.map('map').setView([52.2297, 21.0122], 13);
-const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; <a href="https://www.esri.com">Esri</a>'
+}).addTo(map);
 let marker = null;
 
 // requests permission to use notifications
@@ -44,7 +45,7 @@ document.getElementById('location-button').addEventListener('click', () => {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             marker = L.marker([lat, lon]).addTo(map);
-            map.setView([lat, lon], 13);
+            map.setView([lat, lon], 18);
         });
     } else {
         alert("Twoja przeglądarka nie wspiera geolokalizacji.");
@@ -57,6 +58,10 @@ document.getElementById('download-button').addEventListener('click', () => {
 
     document.getElementById('drop-zone').innerHTML = '';
     createDropZoneGrid();
+
+    if (marker != null) {
+        map.removeLayer(marker);
+    }
 
     leafletImage(map, function(err, canvas) {
         document.getElementById('loading-spinner').style.display = 'none';
@@ -73,6 +78,8 @@ document.getElementById('download-button').addEventListener('click', () => {
         
         createPuzzle(mapCanvas);
     });
+    
+    marker.addTo(map);
 });
 
 // cuts image in canvas into 16 pieces and places them shuffled in #puzzle-container div
