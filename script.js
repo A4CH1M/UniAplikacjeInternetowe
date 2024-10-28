@@ -1,26 +1,20 @@
 "use strict";
 
-const map = L.map('map', { zoomControl: false }).setView([52.2297, 21.0122], 13);
-const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+const map = L.map('map').setView([52.2297, 21.0122], 13);
+const tileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-L.control.zoom({ position: 'topright' }).addTo(map);
+let marker = null;
 
 // requests permission to use notifications
 const requestNotificationPermission = () => {
     if ('Notification' in window) {
-        Notification.requestPermission().then((permission) => {
-            localStorage.setItem('notificationPermission', permission);
-        });
+        Notification.requestPermission();
     }
 };
 
 // sends puzzle completion notification to user
 const notifyUser = () => {
-    const permission = localStorage.getItem('notificationPermission');
-
-    if (permission === 'granted') {
+    if (Notification.permission === 'granted') {
         const options = {
             body: 'Puzzle zostały poprawnie ułożone!',
         };
@@ -43,9 +37,13 @@ window.addEventListener('load', () => {
 document.getElementById('location-button').addEventListener('click', () => {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
+            if (marker != null) {
+                marker.remove();
+            }
+            
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            L.marker([lat, lon]).addTo(map);
+            marker = L.marker([lat, lon]).addTo(map);
             map.setView([lat, lon], 13);
         });
     } else {
@@ -222,12 +220,6 @@ const checkPuzzleCompletion = () => {
     if (pieces.length != 16) {
         return;
     }
-
-    // pieces.forEach((piece, index) => {
-    //     if (piece.id != index) {
-    //         allCorrect = false;
-    //     }
-    // });
 
     for (let i = 0; i < pieces.length; i++) {
         if (pieces[i].id != i) {
