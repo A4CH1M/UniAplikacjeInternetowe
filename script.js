@@ -1,9 +1,10 @@
 "use strict";
 
 const WeatherApp = class {
-    constructor(apiKey, resultsBlockSelector) {
+    constructor(apiKey, resultsBlockSelectorWeather, resultsBlockSelectorForecast) {
         this.apiKey = apiKey;
-        this.resultsBlock = document.querySelector(resultsBlockSelector);
+        this.resultsBlockWeather = document.querySelector(resultsBlockSelectorWeather);
+        this.resultsBlockForecast = document.querySelector(resultsBlockSelectorForecast);
 
         this.currentWeatherData = null;
         this.currentForecastData = null;
@@ -18,7 +19,8 @@ const WeatherApp = class {
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        this.currentWeatherData = JSON.parse(xhr.responseText);
+                        console.log(xhr.responseText);
+                        this.currentWeatherData = JSON.parse(xhr.responseText)
                         resolve();
                     } else {
                         reject("Could not get current wather.");
@@ -33,23 +35,24 @@ const WeatherApp = class {
         try {
             const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=${this.apiKey}&lang=en`);
             if (!response.ok) throw new Error("Could not get wather forecast.");
-            const data = await response.json();
-            this.currentForecastData = data;
+            this.currentForecastData = await response.json();
+            console.log(this.currentForecastData);
         } catch (error) {
             return console.error("Forecast get error: ", error);
         }
     }
 
     getWeather(query) {
-        this.resultsBlock.innerHTML = "";
-
+        this.resultsBlockWeather.innerHTML = "";
+        this.resultsBlockForecast.innerHTML = "";
+        
         Promise.all([this.getCurrentWeather(query), this.getForecast(query)])
             .then(() => {
                 this.drawWeather();
             })
             .catch(error => {
                 console.error(error);
-                this.resultsBlock.innerHTML = `<p>Could not get weather data.</p>`;
+                this.resultsBlockWeather.innerHTML = `<p>Could not get weather data.</p>`;
             });
     }
 
@@ -67,7 +70,7 @@ const WeatherApp = class {
             this.currentWeatherData.weather[0].description
         );
 
-        this.resultsBlock.appendChild(weatherBlock);
+        this.resultsBlockWeather.appendChild(weatherBlock);
 
         for (let forecast of this.currentForecastData.list) {
             const forecastBlock = this.createWeatherBlock(
@@ -78,7 +81,7 @@ const WeatherApp = class {
                 forecast.weather[0].description
             );
 
-            this.resultsBlock.appendChild(forecastBlock);
+            this.resultsBlockForecast.appendChild(forecastBlock);
         }
     }
 
@@ -98,7 +101,7 @@ const WeatherApp = class {
     }
 }
 
-document.weatherApp = new WeatherApp("7f6d0f6986e4cddc54e9ecc6ae4ff44a", "#weather-results-container");
+document.weatherApp = new WeatherApp("7f6d0f6986e4cddc54e9ecc6ae4ff44a", "#current-weather-data", "#forecast-data");
 
 document.querySelector("#check-button").addEventListener("click", function() {
     const query = document.querySelector("#location-input").value;
