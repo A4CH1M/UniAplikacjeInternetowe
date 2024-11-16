@@ -14,19 +14,20 @@ const WeatherApp = class {
         return new Promise((resolve, reject) => {
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&units=metric&appid=${this.apiKey}&lang=en`;
             const xhr = new XMLHttpRequest();
-            
-            xhr.open("GET", url, true);
+    
             xhr.onreadystatechange = () => {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        console.log(xhr.responseText);
-                        this.currentWeatherData = JSON.parse(xhr.responseText)
-                        resolve();
+                        this.currentWeatherData = JSON.parse(xhr.responseText);
+                        console.log(this.currentWeatherData);
+                        resolve(this.currentWeatherData);
                     } else {
-                        reject("Could not get current wather.");
+                        reject("Could not get current weather.");
                     }
                 }
             };
+    
+            xhr.open("GET", url, true);
             xhr.send();
         });
     }
@@ -34,25 +35,32 @@ const WeatherApp = class {
     async getForecast(query) {
         try {
             const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${query}&units=metric&appid=${this.apiKey}&lang=en`);
-            if (!response.ok) throw new Error("Could not get wather forecast.");
+            if (!response.ok) throw new Error("Could not get weather forecast.");
             this.currentForecastData = await response.json();
             console.log(this.currentForecastData);
         } catch (error) {
-            return console.error("Forecast get error: ", error);
+            this.currentForecastData = null;
+            throw new Error("Forecast fetch error: ", error);
         }
     }
 
     getWeather(query) {
         this.resultsBlockWeather.innerHTML = "";
         this.resultsBlockForecast.innerHTML = "";
-        
-        Promise.all([this.getCurrentWeather(query), this.getForecast(query)])
-            .then(() => {
-                this.drawWeather();
-            })
+
+        this.getCurrentWeather(query)
             .catch(error => {
                 console.error(error);
-                this.resultsBlockWeather.innerHTML = `<p>Could not get weather data.</p>`;
+                this.resultsBlockWeather.innerHTML = `<p>Could not get current weather data.</p>`;
+            });
+
+        this.getForecast(query)
+            .catch(error => {
+                console.error(error);
+                this.resultsBlockForecast.innerHTML = `<p>Could not get weather forecast data.</p>`;
+            })
+            .finally(() => {
+                this.drawWeather();
             });
     }
 
