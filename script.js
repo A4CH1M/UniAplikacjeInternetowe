@@ -40,7 +40,7 @@ const WeatherApp = class {
             console.log(this.currentForecastData);
         } catch (error) {
             this.currentForecastData = null;
-            throw new Error("Forecast fetch error: ", error);
+            throw error;
         }
     }
 
